@@ -17,6 +17,8 @@ import json
 import pandas as pd
 from pandas import json_normalize
 import ast
+import os
+import shutil
 
 
 # In[ ]:
@@ -194,7 +196,7 @@ def function(x):
 # In[ ]:
 
 
-def get_all_companies_for_category_truelocal(category):
+def get_all_companies_for_category_truelocal(category, amount_of_data):
     
     try:
     
@@ -204,6 +206,7 @@ def get_all_companies_for_category_truelocal(category):
         resultado = 0   
         count_name_csv = 0   
         pCategory = category.upper()
+        file_name = ""
         while True:
             print(count_name_csv)
 
@@ -226,34 +229,66 @@ def get_all_companies_for_category_truelocal(category):
                             if k2 == "size":
                                 size = v2
 
-            csv_str = 'truelocal_list_category_{}_offset_{}_numbrerCSV_{}.csv'.format(pCategory,offset,count_name_csv)
+            #csv_str = 'truelocal_list_category_{}_offset_{}_numbrerCSV_{}.csv'.format(pCategory,offset,count_name_csv)
 
             df_1 = df.apply(lambda x: function(x), axis=1, result_type="expand")
-            #df_1.to_csv('truelocal_list_contact_1000_7.csv',index=False, header=True, mode='a')
-
-            df_1.to_csv(csv_str ,index=False, header=True, mode='a')
-
-            #if offset >= size:
-            if count_name_csv == 10:
-                break
+            if os.path.exists('truelocal_list_all.csv'):
+                df_1.to_csv('truelocal_list_all.csv' ,index=False, header=False, mode='a')
+                df_1=df_1.assign(Category=pCategory)
             else:
-                resultado = size - offset
-                print("resultado1", resultado)
-                print("size1", size)
-                print("offset1", offset)
-                if resultado > limit:
-                    resultado = 0
-                    offset = offset + limit
-                    print("resultado2", resultado)
-                    print("size2", size)
-                    print("offset2", offset)
-                    print("limit2", limit)
+                df_1.to_csv('truelocal_list_all.csv' ,index=False, header=True, mode='a')
+                df_1=df_1.assign(Category=pCategory)
+            #df_1.to_csv('truelocal_list_contact_1000_7.csv',index=False, header=True, mode='a')
+#             if os.path.exists('truelocal_list_category_{}'.format(pCategory)):
+#                 print("true")
+#                 shutil.move(csv_str, file_name)
+#             else:
+#                 print('false')
+#                 file_name = 'truelocal_list_category_{}'.format(pCategory)
+#                 os.makedirs(file_name)
+#             #if offset >= size:
+            if amount_of_data == 0:
+                if offset >= size:
+                    break
                 else:
-                    offset = offset + resultado
-                    print("resultado3", resultado)
-                    print("size3", size)
-                    print("offset3", offset)
-                    print("limit3", limit)
+                    resultado = size - offset
+                    print("resultado1", resultado)
+                    print("size1", size)
+                    print("offset1", offset)
+                    if resultado > limit:
+                        resultado = 0
+                        offset = offset + limit
+                        print("resultado2", resultado)
+                        print("size2", size)
+                        print("offset2", offset)
+                        print("limit2", limit)
+                    else:
+                        offset = offset + resultado
+                        print("resultado3", resultado)
+                        print("size3", size)
+                        print("offset3", offset)
+                        print("limit3", limit)
+            else:
+                if count_name_csv == amount_of_data:
+                    break
+                else:
+                    resultado = size - offset
+                    print("resultado1", resultado)
+                    print("size1", size)
+                    print("offset1", offset)
+                    if resultado > limit:
+                        resultado = 0
+                        offset = offset + limit
+                        print("resultado2", resultado)
+                        print("size2", size)
+                        print("offset2", offset)
+                        print("limit2", limit)
+                    else:
+                        offset = offset + resultado
+                        print("resultado3", resultado)
+                        print("size3", size)
+                        print("offset3", offset)
+                        print("limit3", limit)
 
             time.sleep(randint(0,4))
         
@@ -269,7 +304,7 @@ def get_all_companies_for_category_truelocal(category):
 # In[ ]:
 
 
-def get_all_companies_of_all_categories():
+def get_all_companies_of_all_categories(amount_of_data):
     
     try:
         
@@ -277,7 +312,7 @@ def get_all_companies_of_all_categories():
         #print(categories)
         for key, value in categories.items():
             print(key)
-            get_all_companies_for_category_truelocal(key)
+            get_all_companies_for_category_truelocal(key, amount_of_data)
     
         return True
     
@@ -285,7 +320,7 @@ def get_all_companies_of_all_categories():
         print({"result":False, "message":"Something went wrong, error details: {}".format(error)})
         return False
     
-get_all_companies_of_all_categories()
+get_all_companies_of_all_categories(0)
 
 
 # In[ ]:
